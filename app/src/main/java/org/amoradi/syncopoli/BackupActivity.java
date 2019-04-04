@@ -3,8 +3,8 @@ package org.amoradi.syncopoli;
 import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.app.Fragment;
-import android.app.FragmentTransaction;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -13,7 +13,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.preference.PreferenceManager;
+import androidx.preference.PreferenceManager;
 import androidx.annotation.LayoutRes;
 import com.google.android.material.snackbar.Snackbar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -527,7 +527,7 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
     public int editBackup(BackupItem item) {
         AddBackupItemFragment f = new AddBackupItemFragment();
         f.setBackupContent(item);
-        getFragmentManager().beginTransaction().replace(R.id.content_container, f).addToBackStack(null).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.content_container, f).addToBackStack(null).commit();
         return 0;
     }
 
@@ -567,7 +567,7 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
 
 
     private void setCurrentFragment(Fragment f, boolean stack) {
-        FragmentTransaction tr = getFragmentManager().beginTransaction().replace(R.id.content_container, f);
+        FragmentTransaction tr = getSupportFragmentManager().beginTransaction().replace(R.id.content_container, f);
 
         if (stack) {
             tr.addToBackStack(null);

@@ -5,8 +5,8 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.Preference;
-import android.preference.PreferenceFragment;
+import androidx.preference.Preference;
+import androidx.preference.PreferenceFragmentCompat;
 import androidx.appcompat.app.AlertDialog;
 import android.util.Log;
 import android.view.Menu;
@@ -14,7 +14,7 @@ import android.view.MenuInflater;
 import android.widget.Toast;
 
 
-public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class SettingsFragment extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener {
     private static final String TAG = "Syncopoli";
 
     public final static String KEY_SERVER_ADDRESS = "pref_key_server_address"; // String
@@ -107,8 +107,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void onCreatePreferences(Bundle savedInstanceState, String rootKey){
         addPreferencesFromResource(R.xml.pref_general);
         setHasOptionsMenu(true);
 

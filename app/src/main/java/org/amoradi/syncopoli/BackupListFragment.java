@@ -1,6 +1,6 @@
 package org.amoradi.syncopoli;
 
-import android.app.Fragment;
+import androidx.fragment.app.Fragment;
 import android.os.Bundle;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -45,7 +45,8 @@ public class BackupListFragment extends Fragment {
                 @Override
                 public void onClick(View view) {
                     AddBackupItemFragment f = new AddBackupItemFragment();
-                    getFragmentManager().beginTransaction().replace(R.id.content_container, f).addToBackStack(null).commit();
+                    BackupListFragment.this.getActivity().
+                            getSupportFragmentManager().beginTransaction().replace(R.id.content_container, f).addToBackStack(null).commit();
                 }
             });
         }
