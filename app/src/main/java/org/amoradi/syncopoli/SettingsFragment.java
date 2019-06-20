@@ -301,7 +301,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         }
     }
 
-	private class AcceptHostFingerprintTask extends AsyncTask<Void, Void, Boolean> {
+	static private class AcceptHostFingerprintTask extends AsyncTask<Void, Void, Boolean> {
 		private Context mContext;
 		private SSHManager sshman;
 		private String fingerprint;
@@ -352,6 +352,34 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         }
     }
 
+    static public class VerifyFingerprintDialog extends DialogFragment {
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            final String fp = getArguments().getString("fp");
+            final Context ctx = getActivity();
+
+            DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    switch (which){
+                        case DialogInterface.BUTTON_POSITIVE:
+                            new AcceptHostFingerprintTask(ctx, fp).execute();
+                            break;
+
+                        case DialogInterface.BUTTON_NEGATIVE:
+                            break;
+                    }
+                }
+            };
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(ctx);//, R.style.AppTheme);
+            builder.setMessage("Does the following fingerprint match the host?\n" + fp);
+            builder.setPositiveButton("Yes", dialogClickListener);
+            builder.setNegativeButton("No", dialogClickListener);
+            return builder.create();
+        }
+    }
+
     private class GetHostFingerprintTask extends AsyncTask<Void, String, String> {
         private Context mContext;
         private SSHManager sshman;
@@ -372,26 +400,13 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                 Toast.makeText(mContext, "Failed to verify host.", Toast.LENGTH_SHORT).show();
                 return;
             }
+            VerifyFingerprintDialog dialog = new VerifyFingerprintDialog();
+            Bundle args = new Bundle();
+            args.putString("fp", result);
+            dialog.setArguments(args);
 
-            DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    switch (which){
-                        case DialogInterface.BUTTON_POSITIVE:
-                            new AcceptHostFingerprintTask(mContext, result).execute();
-                            break;
-
-                        case DialogInterface.BUTTON_NEGATIVE:
-                            break;
-                    }
-                }
-            };
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(mContext, R.style.AppTheme);
-            builder.setMessage("Does the following fingerprint match the host?\n" + result);
-            builder.setPositiveButton("Yes", dialogClickListener);
-            builder.setNegativeButton("No", dialogClickListener);
-            builder.show();
+            FragmentTransaction tr = getFragmentManager().beginTransaction();
+            dialog.show(tr, "dialog");
         }
     }
 
