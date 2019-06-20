@@ -47,6 +47,8 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
     public static final String SYNC_ACCOUNT_NAME = "Syncopoli Sync Account";
     public static final String SYNC_ACCOUNT_TYPE = "org.amoradi.syncopoli";
 
+    public static final String FRAGMENT_PREFERENCES_TAG = "fragPref";
+
     protected class Perm {
         public String value;
         public int code;
@@ -216,7 +218,7 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
         if (id == R.id.action_run) {
             syncBackups();
         } else if (id == R.id.menu_settings) {
-            setCurrentFragment(new SettingsFragment(), true);
+            setCurrentFragment(new SettingsFragment(), true, FRAGMENT_PREFERENCES_TAG);
 		} else if (id == R.id.menu_export) {
 			if (exportSettings() == 0) {
 			    File f = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), "syncopoli_export.json");
@@ -565,9 +567,12 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
         setCurrentFragment(f, true);
     }
 
-
     private void setCurrentFragment(Fragment f, boolean stack) {
-        FragmentTransaction tr = getSupportFragmentManager().beginTransaction().replace(R.id.content_container, f);
+        setCurrentFragment(f, stack, null);
+    }
+
+    private void setCurrentFragment(Fragment f, boolean stack, String tag) {
+        FragmentTransaction tr = getSupportFragmentManager().beginTransaction().replace(R.id.content_container, f, tag);
 
         if (stack) {
             tr.addToBackStack(null);
@@ -578,10 +583,14 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
 
     public int copyExecutables() {
 		int ret = copyExecutable("rsync");
-
 		if (ret != 0) {
 			return ret;
 		}
+
+		ret = copyExecutable("dropbearkey");
+        if (ret != 0) {
+            return ret;
+        }
 		
         return copyExecutable("ssh");
     }

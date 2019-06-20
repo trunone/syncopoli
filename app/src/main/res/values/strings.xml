@@ -58,4 +58,28 @@
     <string name="pref_sum_wifi_only">Sync will require Wifi connection to proceed</string>
     <string name="pref_sum_no_wifi_only">Sync will proceed on any network connection (including mobile data)</string>
     <string name="pref_sum_as_root">Requires su binary</string>
+
+    <!-- SSH key subscreen -->
+    <string name="pref_title_ssh_key_screen">SSH Key</string>
+    <string name="pref_sum_ssh_key_screen">Generate, import or export SSH keys</string>
+    <string name="pref_title_gen_ssh_key">Generate Key</string>
+    <string name="pref_sum_gen_ssh_key">Generates a new SSH key pair</string>
+    <string name="pref_title_export_ssh_key">Export Key</string>
+    <string name="pref_sum_export_ssh_key">Export/share the public key</string>
+    <string name="pref_title_import_ssh_key">Import Key</string>
+    <string name="pref_sum_import_ssh_key">Import a SSH private key (dropbear format)</string>
+    <string-array name="pref_entries_sshkeygen">
+        <item>2048 bits</item>
+        <item>4096 bits</item>
+    </string-array>
+    <string name="dialog_cancel">Cancel</string>
+    <string name="pref_dialog_gen_ssh_key">Generate Key</string>
+    <string name="pref_dialog_import_ssh_key">Import Key</string>
+    <string name="pref_dialog_key_length">SSH Key length</string>
+    <string name="pref_dialog_key_replace">Replace current SSH key</string>
+    <string name="pref_dialog_key_replace_msg">SSH Key already exists. Do you want to overwrite the key?</string>
+    <string name="pref_dialog_key_generate">Generating SSH Key...</string>
+    <string name="pref_toast_key_success">Successfully generated SSH Keyx</string>
+    <string name="pref_toast_key_failed">SSH Key generation failed</string>
+    <string name="pref_toast_import_key_failed">"Failed to import SSH Key file"</string>
 </resources>

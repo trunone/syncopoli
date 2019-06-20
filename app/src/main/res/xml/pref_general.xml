@@ -1,7 +1,10 @@
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <PreferenceCategory
         android:title="@string/pref_category_general"
-        android:key="pref_key_general">
+        android:key="pref_key_general"
+        app:iconSpaceReserved="false">
 
         <ListPreference
             android:title="@string/pref_title_protocol"
@@ -9,7 +12,8 @@
             android:dialogTitle="@string/pref_title_protocol"
             android:entries="@array/pref_entries_protocol"
             android:entryValues="@array/pref_entries_protocol"
-            android:defaultValue="@string/pref_default_protocol"/>
+            android:defaultValue="@string/pref_default_protocol"
+            app:iconSpaceReserved="false"/>
 
         <EditTextPreference
             android:capitalize="none"
@@ -62,14 +66,40 @@
             android:singleLine="true"
             android:title="@string/pref_title_options" />
 
-        <EditTextPreference
-            android:defaultValue=""
-            android:inputType="text"
-            android:key="pref_key_private_key"
-            android:maxLines="1"
-            android:selectAllOnFocus="false"
-            android:singleLine="true"
-            android:title="@string/pref_title_private_key" />
+        <PreferenceScreen
+            android:persistent="false"
+            android:title="@string/pref_title_ssh_key_screen"
+            android:key="pref_key_subscreen_SSH"
+            android:summary="@string/pref_sum_ssh_key_screen">
+
+            <PreferenceCategory
+                android:title="SSH Key"
+                android:key="pref_key_ssh_key">
+
+                <Preference
+                    android:title="@string/pref_title_gen_ssh_key"
+                    android:key="pref_key_gen_SSH"
+                    android:summary="@string/pref_sum_gen_ssh_key"/>
+
+                <Preference
+                    android:title="@string/pref_title_export_ssh_key"
+                    android:key="pref_key_export_SSH"
+                    android:summary="@string/pref_sum_export_ssh_key"/>
+
+            </PreferenceCategory>
+
+            <PreferenceCategory
+                android:title="Legacy options"
+                android:key="pref_key_ssh_legacy">
+
+                <Preference
+                    android:title="@string/pref_title_import_ssh_key"
+                    android:key="pref_key_import_SSH"
+                    android:summary="@string/pref_sum_import_ssh_key"/>
+
+            </PreferenceCategory>
+
+        </PreferenceScreen>
 
         <EditTextPreference
             android:defaultValue=""

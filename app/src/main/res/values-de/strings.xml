@@ -45,4 +45,24 @@
 
     <string name="pref_sum_wifi_only">Die Synchronisation läuft nur über WLAN</string>
     <string name="pref_sum_no_wifi_only">Die Synchronisation läuft unabhängig von der Netzwerkverbindung (Mobile Daten können beansprucht werden)</string>
+
+    <!-- SSH key subscreen -->
+    <string name="pref_title_ssh_key_screen">SSH Schlüssel</string>
+    <string name="pref_sum_ssh_key_screen">SSH Schlüssel erzeugen, importieren und exportieren</string>
+    <string name="pref_title_gen_ssh_key">Schlüssel erzeugen</string>
+    <string name="pref_sum_gen_ssh_key">Erzeugt ein neues SSH Schlüsselpaar</string>
+    <string name="pref_title_export_ssh_key">Schlüssel exportieren</string>
+    <string name="pref_sum_export_ssh_key">Exportiert/teilt den öffentlichen Schlüssel</string>
+    <string name="pref_title_import_ssh_key">Schlüssel importieren</string>
+    <string name="pref_sum_import_ssh_key">Importiert einen privaten SSH-Schlüssel (dropbear Format)</string>
+    <string name="dialog_cancel">Abbrechen</string>
+    <string name="pref_dialog_gen_ssh_key">Schlüssel erzeugen</string>
+    <string name="pref_dialog_import_ssh_key">Schlüssel importieren</string>
+    <string name="pref_dialog_key_length">SSH Schlüssellänge</string>
+    <string name="pref_dialog_key_replace">Aktuellen SSH Schlüssel ersetzen</string>
+    <string name="pref_dialog_key_replace_msg">Es existiert bereits ein SSH Schlüssel. Soll der Schlüssel überschrieben werden?</string>
+    <string name="pref_dialog_key_generate">Erzeuge SSH Schlüssel...</string>
+    <string name="pref_toast_key_success">SSH Schlüssel erfolgreiche erzeugt</string>
+    <string name="pref_toast_key_failed">Fehler beim erzeugen des SSH Schlüssels</string>
+    <string name="pref_toast_import_key_failed">"Fahler beim Import des SSH Schlüssels"</string>
 </resources>

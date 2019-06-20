@@ -6,10 +6,14 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -17,6 +21,7 @@ import java.util.regex.Pattern;
 
 public class SSHManager {
     private static final String TAG = "Syncopoli";
+    private static final String KEYFILE = "id_dropbear";
 
     private Context mContext;
 
@@ -26,9 +31,12 @@ public class SSHManager {
      */
     private Pattern mFingerprintPattern = Pattern.compile("^Fingerprint: [\\w\\d]+ ([\\w:]+)$");
     private Pattern mAcceptedPattern = Pattern.compile("^Accepted fingerprint$");
+    private Pattern mPubKeyPattern = Pattern.compile("^ssh-\\w+\\s+\\S+\\s+\\S+$");
 
     private String host;
     private String port;
+
+    private String mPubKey;
 
     SSHManager(Context ctx) throws NumberFormatException {
         mContext = ctx;
@@ -204,5 +212,105 @@ public class SSHManager {
         }
 
         return true;
+    }
+
+    public void writeKeyFromInput(InputStream src) throws  IOException {
+
+        OutputStream dst = new DataOutputStream(mContext.openFileOutput(KEYFILE, Context.MODE_PRIVATE));
+
+        byte data[] = new byte[4096];
+        int count;
+
+        while ((count = src.read(data)) != -1) {
+            dst.write(data, 0, count);
+        }
+        dst.close();
+    }
+
+    public boolean isKeyPresent() {
+        File file = mContext.getFileStreamPath(KEYFILE);
+        return file.exists();
+    }
+
+    public boolean generateKey(int size) {
+        // delete before generating
+        deleteKey();
+
+        // build command
+        File f = new File(mContext.getFilesDir(), "dropbearkey");
+        List<String> args = Arrays.asList(f.getAbsolutePath(),
+                "-t", "rsa",
+                "-f", KEYFILE,
+                "-s", Integer.toString(size));
+
+        ProcessBuilder pb = new ProcessBuilder(args);
+        pb.directory(mContext.getFilesDir());
+
+        // run process
+        Process process;
+        try {
+            process = pb.start();
+        } catch (IOException e) {
+            Log.e(TAG, "Could not run dropbearkey: " + e.toString());
+            return true;
+        }
+
+        int ret;
+        try {
+            ret = process.waitFor();
+        } catch (InterruptedException e) {
+            Log.e(TAG, e.toString());
+            return true;
+        }
+
+        return ret>0;
+    }
+
+    public String getPubKey() {
+        // build command
+        File f = new File(mContext.getFilesDir(), "dropbearkey");
+        List<String> args = Arrays.asList(f.getAbsolutePath(),
+                "-y",
+                "-f", KEYFILE);
+
+        ProcessBuilder pb = new ProcessBuilder(args);
+        pb.directory(mContext.getFilesDir());
+
+        // run process
+        Process process;
+        try {
+            process = pb.start();
+        } catch (IOException e) {
+            Log.e(TAG, "Could not run dropbearkey: " + e.toString());
+            return null;
+        }
+
+        // read stdout
+        String temp;
+        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        String pubKey = null;
+        try {
+            while ((temp = reader.readLine()) != null) {
+                if (pubKey == null) {
+                    Matcher m = mPubKeyPattern.matcher(temp);
+                    if (m.matches()) {
+                        pubKey = m.group(0);
+                    }
+                }
+                // keep reading until "EOF"
+            }
+        } catch (IOException e) {
+            Log.e(TAG, "Could not read from dropbearkey process");
+        }
+        if (pubKey == null) {
+            Log.e(TAG, "Failed to read public key from dropbearkey output.");
+        }
+
+        return pubKey;
+    }
+
+    public void deleteKey() {
+        File keyFile = new File(mContext.getFilesDir(), KEYFILE);
+        keyFile.delete();
     }
 }
