@@ -1,0 +1,60 @@
+<resources>
+
+
+    <string name="app_name">Syncopoli</string>
+    <string name="action_settings">Definições</string>
+
+    <string name="backup_title">Cópia de segurança</string>
+    <string name="settings_title">Definições</string>
+    <string name="export_title">Exportar</string>
+    <string name="import_title">Importar</string>
+    <string name="action_run_backup">Executar cópia de segurança</string>
+
+    <string name="addbackupitem_name">Nome do perfil</string>
+    <string name="addbackupitem_origin">Origem</string>
+    <string name="addbackupitem_destination">Destino</string>
+    <string name="addbackupitem_rsync_options">Opções adicionais rsync</string>
+    <string name="addbackupitem_frequency">Frequência (horas)</string>
+    <string name="addbackupitem_direction_prompt">Sentido cópia de segurança</string>
+    <string-array name="addbackupitem_direction_entries">
+        <item>Remoto para local</item>
+        <item>Local para remoto</item>
+    </string-array>
+
+    <!-- Action bar icons -->
+    <string name="action_refresh">Atualizar</string>
+    <string name="action_done">Guardar</string>
+    <string name="action_run">Executar todas as cópias de segurança</string>
+
+    <!-- Strings related to Settings -->
+    
+    <!-- General settings -->
+    <string name="pref_header_general">Geral</string>
+    <string name="pref_title_server_address">Endereço do servidor</string>
+    <string name="pref_title_private_key">Ficheiro chave privada</string>
+    <string name="pref_title_username">Utilizador</string>
+    <string name="pref_title_options">Opções adicionais</string>
+    <string name="pref_title_protocol">Protocolo</string>
+    <string name="pref_default_protocol">Rsync</string>
+    <string name="pref_title_port">Porta</string>
+    <string name="pref_title_frequency">Frequência (horas)</string>
+    <string name="pref_title_rsync_password">Palavra-passe de Rsync</string>
+    <string name="pref_title_ssh_password">Palavra-passe de SSH</string>
+    <string name="pref_title_wifi_only">Só por Wifi</string>
+    <string name="pref_title_wifi_name">SSIDs para sincronizar (separado por ;)</string>
+    <string name="pref_title_as_root">Executar como root</string>
+    <string name="pref_title_verify_host">Confiar na impressão do equipamento</string>
+    <string name="pref_title_clear_hosts">Eliminar equipamentos de confiança</string>
+
+    <string-array name="pref_entries_protocol">
+        <item>SSH</item>
+        <item>Rsync</item>
+    </string-array>
+
+    <string name="pref_category_general">Geral</string>
+    <string name="pref_category_sync_backup">Sincronização &amp; Cópia de segurança</string>
+
+    <string name="pref_sum_wifi_only">Sincronização exige uma ligação Wifi para executar</string>
+    <string name="pref_sum_no_wifi_only">Sincronização irá executar em qualquer conexão de rede (incluindo dados móveis)</string>
+    <string name="pref_sum_as_root">Exige binário su</string>
+</resources>
