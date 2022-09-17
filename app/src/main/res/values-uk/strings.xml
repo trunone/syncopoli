@@ -1,0 +1,61 @@
+<resources
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="MissingTranslation">
+
+    <string name="app_name">Syncopoli</string>
+    <string name="action_settings">Налаштування</string>
+
+    <string name="backup_title">Резервна копія</string>
+    <string name="settings_title">Налаштування</string>
+    <string name="export_title">Експортувати</string>
+    <string name="import_title">Імпортувати</string>
+    <string name="action_run_backup">Запустити резервне копіювання</string>
+
+    <string name="addbackupitem_name">Назва профілю</string>
+    <string name="addbackupitem_origin">Джерело</string>
+    <string name="addbackupitem_destination">Призначення</string>
+    <string name="addbackupitem_rsync_options">Додаткові параметри rsync</string>
+    <string name="addbackupitem_frequency">Частота (у годинах)</string>
+    <string name="addbackupitem_direction_prompt">Напрямок резервного копіювання</string>
+    <string-array name="addbackupitem_direction_entries">
+        <item>Віддалений -> локальний</item>
+        <item>Локальний -> віддалений</item>
+    </string-array>
+
+    <!-- Action bar icons -->
+    <string name="action_refresh">Оновити</string>
+    <string name="action_done">Готово</string>
+    <string name="action_run">Запустити всі резервні копіювання</string>
+
+    <!-- Strings related to Settings -->
+
+    <!-- General settings -->
+    <string name="pref_header_general">Загальні</string>
+    <string name="pref_title_server_address">Адреса сервера</string>
+    <string name="pref_title_private_key">Файл приватного ключа</string>
+    <string name="pref_title_username">Корстувач</string>
+    <string name="pref_title_options">Додаткові параметри</string>
+    <string name="pref_title_protocol">Протокол</string>
+    <string name="pref_default_protocol">Rsync</string>
+    <string name="pref_title_port">Порт</string>
+    <string name="pref_title_frequency">Частота (години)</string>
+    <string name="pref_title_rsync_password">Пароль Rsync</string>
+    <string name="pref_title_ssh_password">Пароль SSH</string>
+    <string name="pref_title_wifi_only">Тільки Wifi</string>
+    <string name="pref_title_wifi_name">SSID для синхронізації (розділені ;)</string>
+    <string name="pref_title_as_root">Запустити як root</string>
+    <string name="pref_title_verify_host">Довіряти відбитку хоста<string>
+    <string name="pref_title_clear_hosts">Очистити довірені хости</string>
+
+    <string-array name="pref_entries_protocol">
+        <item>SSH</item>
+        <item>Rsync</item>
+    </string-array>
+
+    <string name="pref_category_general">Загальні</string>
+    <string name="pref_category_sync_backup">Синхронизація &amp; Резервне копіювання</string>
+
+    <string name="pref_sum_wifi_only">Для синхронізації потрібно Wifi з\'єднання</string>
+    <string name="pref_sum_no_wifi_only">Синхронізація здійснюватиметься при будь-якому підключенні до пережі (включаючи мобільні дані)</string>
+    <string name="pref_sum_as_root">Потрібен двійковий файл su</string>
+</resources>
