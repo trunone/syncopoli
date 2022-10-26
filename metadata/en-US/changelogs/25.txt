@@ -1,0 +1,15 @@
+v0.7
+----
+- Add androidx.constraintlayout dependency
+- Update Gradle plugin to v7.2
+- Update gitlab CI to work with gradle 7
+- Fix crash due to missing startForeground() in onCreate of service
+- Reduce lag when viewing large log files
+- Add button to scroll to bottom of log file
+- Add feature to only sync when charging
+- Fix bug related to saving shared preferences
+- Fix fingerprint recognition which prevented fingerprint check to proceed
+- Include full rsync command in log file
+- Open activity if notification is pressed
+- Add GET_ACCOUNTS permission, required by newer versions of android
+- add portugese and ukrainian translation (thank you Tiago Avila anad Sergiy Stupar)
