@@ -1,15 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
-    ndkVersion '25.1.8937393'
     compileSdkVersion 28
 
     defaultConfig {
         applicationId "org.amoradi.syncopoli"
         minSdkVersion 16
         targetSdkVersion 28
-        versionCode 24
-        versionName "v0.6"
+        versionCode 25
+        versionName "v0.7"
         vectorDrawables.useSupportLibrary = true
 
         externalNativeBuild {
