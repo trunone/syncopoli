@@ -9,6 +9,7 @@ import android.util.Log;
 import java.text.Format;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -21,7 +22,7 @@ class BackupItem implements Parcelable {
     };
 
     public String name;
-    public String[] sources;
+    public ArrayList<String> sources;
     public String destination;
     public Date lastUpdate;
     public Direction direction;
@@ -34,9 +35,9 @@ class BackupItem implements Parcelable {
     public BackupItem(BackupItem other) {
         this.name = other.name;
 
-        if (other.sources.length > 0) {
-            this.sources = new String[other.sources.length];
-            System.arraycopy(other.sources, 0, this.sources, 0, other.sources.length);
+        if (other.sources.size() > 0) {
+            this.sources = new ArrayList<String>();
+            this.sources.addAll(other.sources);
         }
             
         this.destination = other.destination;
@@ -70,9 +71,9 @@ class BackupItem implements Parcelable {
         out.writeString(name);
 
         if (sources != null) {
-            out.writeStringArray(sources);
+            out.writeStringList(sources);
         } else {
-            out.writeStringArray(new String[0]);
+            out.writeStringList(new ArrayList<String>());
         }
 
         out.writeString(destination);
@@ -104,7 +105,7 @@ class BackupItem implements Parcelable {
 		public BackupItem createFromParcel(Parcel in) {
 			BackupItem b = new BackupItem();
 			b.name = in.readString();
-			b.sources = in.createStringArray();
+			b.sources = in.createStringArrayList();
 			b.destination = in.readString();
 
 			SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

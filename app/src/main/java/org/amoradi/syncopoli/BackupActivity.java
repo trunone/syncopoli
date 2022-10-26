@@ -37,6 +37,7 @@ import java.io.OutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -408,15 +409,14 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
                 b.name = jb.getString("name");
 
                 JSONArray sources = jb.optJSONArray("sources");
+                b.sources = new ArrayList<String>();
                 if (sources != null) {
-                    b.sources = new String[sources.length()];
                     for (int k= 0; k < sources.length(); k++) {
-                        b.sources[k] = sources.getString(k);
+                        b.sources.add(sources.getString(k));
                     }
                 } else {
                     // compatibility with v1 config where sources was source
-                    b.sources = new String[1];
-                    b.sources[0] = jb.getString("source");
+                    b.sources.add(jb.getString("source"));
                 }
 
                 b.destination = jb.getString("destination");

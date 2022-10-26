@@ -19,6 +19,9 @@ import android.widget.Spinner;
 
 import static android.app.Activity.RESULT_OK;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 public class AddBackupItemFragment extends Fragment {
     IBackupHandler mHandler;
     BackupItem mBackup = null;
@@ -90,7 +93,7 @@ public class AddBackupItemFragment extends Fragment {
         }
 
         v_name.setText(mBackup.name);
-        v_src.setText(TextUtils.join("\n", mBackup.sources));
+        v_src.setText(TextUtils.join("\n", mBackup.sources.toArray()));
         v_dst.setText(mBackup.destination);
         v_opts.setText(mBackup.rsync_options);
 
@@ -118,33 +121,39 @@ public class AddBackupItemFragment extends Fragment {
         int id = item.getItemId();
 
         if (id == R.id.action_done) {
-            BackupItem i = new BackupItem();
+            BackupItem backupItem = new BackupItem();
 
             View v = getView();
 
             EditText t = (EditText) v.findViewById(R.id.addbackupitem_source);
-            i.sources = t.getText().toString().replaceAll("(?m)^[ \t]*\n", "").split("\n");
+
+            backupItem.sources = new ArrayList<String>();
+            for (String s : t.getText().toString().split("\n")) {
+                if (s.trim() != "") {
+                    backupItem.sources.add(s.trim());
+                }
+            }
 
             t = (EditText) v.findViewById(R.id.addbackupitem_destination);
-            i.destination = t.getText().toString();
+            backupItem.destination = t.getText().toString();
 
             t = (EditText) v.findViewById(R.id.addbackupitem_name);
-            i.name = t.getText().toString();
+            backupItem.name = t.getText().toString();
 
             t = (EditText) v.findViewById(R.id.addbackupitem_rsync_options);
-            i.rsync_options = t.getText().toString();
+            backupItem.rsync_options = t.getText().toString();
 
             Spinner s = (Spinner) v.findViewById(R.id.addbackupitem_direction);
             if (s.getSelectedItemPosition() == 0) {
-                i.direction = BackupItem.Direction.INCOMING;
+                backupItem.direction = BackupItem.Direction.INCOMING;
             } else {
-                i.direction = BackupItem.Direction.OUTGOING;
+                backupItem.direction = BackupItem.Direction.OUTGOING;
             }
 
             if (mBackup == null) {
-                mHandler.addBackup(i);
+                mHandler.addBackup(backupItem);
             } else {
-                mHandler.updateBackup(mBackup.name, i);
+                mHandler.updateBackup(mBackup.name, backupItem);
             }
         } else {
             return super.onOptionsItemSelected(item);

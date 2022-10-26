@@ -54,7 +54,7 @@ public class BackupHandler implements IBackupHandler {
     public int addBackup(BackupItem item) {
         Log.d(TAG, "Adding backup: " + item);
 
-        if (item.sources[0].equals("") || item.name.equals("")) {
+        if (item.sources.get(0).equals("") || item.name.equals("")) {
             return -1;
         }
 
@@ -174,7 +174,7 @@ public class BackupHandler implements IBackupHandler {
         do {
             BackupItem x = new BackupItem();
             x.name = c.getString(c.getColumnIndex(BackupSyncSchema.COLUMN_NAME));
-            x.sources = c.getString(c.getColumnIndex(BackupSyncSchema.COLUMN_SOURCES)).split("\n");
+            x.sources = new ArrayList<String>(Arrays.asList(c.getString(c.getColumnIndex(BackupSyncSchema.COLUMN_SOURCES)).split("\n")));
             x.destination = c.getString(c.getColumnIndex(BackupSyncSchema.COLUMN_DESTINATION));
             x.rsync_options = c.getString(c.getColumnIndex(BackupSyncSchema.COLUMN_RSYNC_OPTIONS));
 
@@ -353,7 +353,7 @@ public class BackupHandler implements IBackupHandler {
                 }
 
                 if (b.direction == BackupItem.Direction.OUTGOING) {
-                    args.addAll(Arrays.asList(b.sources));
+                    args.addAll(b.sources);
                     args.add(rsync_username + "@" + server_address + ":" + b.destination);
                 } else {
                     for (String s : b.sources) {
@@ -366,7 +366,7 @@ public class BackupHandler implements IBackupHandler {
                 args.add("--port=" + port);
 
                 if (b.direction == BackupItem.Direction.OUTGOING) {
-                    args.addAll(Arrays.asList(b.sources));
+                    args.addAll(b.sources);
                     args.add(rsync_username + "@" + server_address + "::" + b.destination);
                 } else {
                     for (String s : b.sources) {
