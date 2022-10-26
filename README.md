@@ -132,3 +132,5 @@ Translators
 * German - [Christian](https://gitlab.com/u/epinez)
 * Italian - [Claudio Arseni](https://gitlab.com/Claudinux)
 * Dutch - [Nathan van Beelen](https://gitlab.com/nvbln)
+* Portugese - [Tiago Avila](https://gitlab.com/Tisila)
+* Ukranian - [Sergiy Stupar](https://gitlab.com/Sestowner)
