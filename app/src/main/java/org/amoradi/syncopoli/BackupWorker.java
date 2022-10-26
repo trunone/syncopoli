@@ -126,7 +126,7 @@ public class BackupWorker extends Worker {
         try {
             ret = h.runBackup(b);
         } catch (Exception e) {
-            // XXX: Catch all exceptions wo the scheduled worker does not
+            // XXX: Catch all exceptions so the scheduled worker does not
             // crash and has issues to recover on new periodic sync
             ret = BackupHandler.ERROR_GENERIC;
             e.printStackTrace();
