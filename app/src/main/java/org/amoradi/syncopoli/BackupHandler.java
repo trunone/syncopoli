@@ -2,9 +2,12 @@ package org.amoradi.syncopoli;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.BatteryManager;
 import android.os.Build;
 import android.net.wifi.SupplicantState;
 import android.net.wifi.WifiInfo;
@@ -40,8 +43,8 @@ public class BackupHandler implements IBackupHandler {
     public static final int ERROR_BACKUP_EXISTS = -3;
     public static final int ERROR_BACKUP_MISSING = -4;
     public static final int ERROR_TOO_MANY_RESULTS = -5;
-	public static final int ERROR_RSYNC_MISSING = -6;
-	public static final int ERROR_SSH_MISSING = -7;
+    public static final int ERROR_RSYNC_MISSING = -6;
+    public static final int ERROR_SSH_MISSING = -7;
 
     public BackupHandler(Context ctx) {
         mContext = ctx;
@@ -50,7 +53,7 @@ public class BackupHandler implements IBackupHandler {
 
     public int addBackup(BackupItem item) {
         Log.d(TAG, "Adding backup: " + item);
-        
+
         if (item.sources[0].equals("") || item.name.equals("")) {
             return -1;
         }
@@ -189,7 +192,7 @@ public class BackupHandler implements IBackupHandler {
             }
 
             bl.add(x);
-        } while(c.moveToNext());
+        } while (c.moveToNext());
 
         c.close();
         db.close();
@@ -328,11 +331,11 @@ public class BackupHandler implements IBackupHandler {
             args.add(f.getAbsolutePath());
 
             if (!rsync_options.equals("")) {
-				args.addAll(ArgumentTokenizer.tokenize(rsync_options));
+                args.addAll(ArgumentTokenizer.tokenize(rsync_options));
             }
 
             if (!b.rsync_options.equals("")) {
-				args.addAll(ArgumentTokenizer.tokenize(b.rsync_options));
+                args.addAll(ArgumentTokenizer.tokenize(b.rsync_options));
             }
 
             if (protocol.equals("SSH")) {
@@ -360,8 +363,8 @@ public class BackupHandler implements IBackupHandler {
                 }
 
             } else if (protocol.equals("Rsync")) {
-				args.add("--port=" + port);
-				
+                args.add("--port=" + port);
+
                 if (b.direction == BackupItem.Direction.OUTGOING) {
                     args.addAll(Arrays.asList(b.sources));
                     args.add(rsync_username + "@" + server_address + "::" + b.destination);
@@ -374,6 +377,7 @@ public class BackupHandler implements IBackupHandler {
             }
 
             Log.d(TAG, "rsync exec: " + args.toString());
+            logFile.write(("rsync exec: " + args.toString() + "\n\n").getBytes());
 
             /*
              * AS ROOT
@@ -393,6 +397,7 @@ public class BackupHandler implements IBackupHandler {
                 final_cmd.add(sb.toString());
 
                 Log.d(TAG, "with su: " + final_cmd.toString());
+                logFile.write(("with su: " + final_cmd.toString() + "\n\n").getBytes());
             } else {
                 final_cmd = args;
             }
@@ -456,6 +461,14 @@ public class BackupHandler implements IBackupHandler {
         }
     }
 
+    private boolean isCharging() {
+        IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+        Intent batteryStatus = mContext.registerReceiver(null, filter);
+        int status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
+        return (status == BatteryManager.BATTERY_STATUS_CHARGING) ||
+                (status == BatteryManager.BATTERY_STATUS_FULL);
+    }
+
     public boolean canRunBackup() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
         boolean wifi_only = prefs.getBoolean(SettingsFragment.KEY_WIFI_ONLY, false);
@@ -465,7 +478,15 @@ public class BackupHandler implements IBackupHandler {
             return true;
         }
 
-        WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
+        boolean chargerOnly = prefs.getBoolean(SettingsFragment.KEY_CHARGER_ONLY, false);
+        if (chargerOnly && !isCharging()) {
+            Log.d(TAG, SettingsFragment.KEY_CHARGER_ONLY +
+                    " is set to true and phone not connected to charger");
+            return false;
+        }
+
+        WifiManager wifiManager = (WifiManager) mContext.getApplicationContext()
+                .getSystemService(Context.WIFI_SERVICE);
         if (!wifiManager.isWifiEnabled()) {
             Log.d(TAG, "Wifi not enabled");
             return false;
@@ -484,7 +505,7 @@ public class BackupHandler implements IBackupHandler {
         }
 
         if (wifi_name.equals("")) {
-	       return true;
+            return true;
         }
 
         String ssid = wifiInfo.getSSID();
@@ -514,7 +535,13 @@ public class BackupHandler implements IBackupHandler {
         return prefs.getBoolean("RunOnWifi", false);
     }
 
-    public void syncBackups() {}
-    public void showLog(BackupItem b) {}
-    public int editBackup(BackupItem b) {return 0;}
+    public void syncBackups() {
+    }
+
+    public void showLog(BackupItem b) {
+    }
+
+    public int editBackup(BackupItem b) {
+        return 0;
+    }
 }

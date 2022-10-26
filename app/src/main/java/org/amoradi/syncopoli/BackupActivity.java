@@ -8,8 +8,10 @@ import android.app.FragmentTransaction;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -65,7 +67,8 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
         new Perm(android.Manifest.permission.INTERNET, 5),
         new Perm(android.Manifest.permission.ACCESS_WIFI_STATE, 6),
         new Perm(android.Manifest.permission.ACCESS_COARSE_LOCATION, 7),
-        new Perm(android.Manifest.permission.WAKE_LOCK, 8)
+        new Perm(android.Manifest.permission.WAKE_LOCK, 8),
+        new Perm(Manifest.permission.GET_ACCOUNTS, 9)
     };
 
     BackupHandler mBackupHandler;
@@ -74,7 +77,6 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_backup);
-
         setup(true);
     }
 
@@ -253,7 +255,7 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		try {
 			for (String k : SettingsFragment.KEYS) {
-                if (k.equals(SettingsFragment.KEY_WIFI_ONLY)) {
+                if (SettingsFragment.isSharedPreferenceBooleanKey(k)) {
                     globals.put(k, prefs.getBoolean(k, false));
                 } else {
                     globals.put(k, prefs.getString(k, ""));
@@ -443,15 +445,15 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
 			SharedPreferences.Editor editor = prefs.edit();
 
             for (String k : SettingsFragment.KEYS) {
-                if (k.equals(SettingsFragment.KEY_WIFI_ONLY)) {
-                    editor.putBoolean(k, globals.getBoolean(k));
-                } else {
-                    editor.putString(k, globals.getString(k));
+                if (globals.has(k)) {
+                    if (SettingsFragment.isSharedPreferenceBooleanKey(k)) {
+                        editor.putBoolean(k, globals.getBoolean(k));
+                    } else {
+                        editor.putString(k, globals.getString(k));
+                    }
                 }
             }
-
             editor.apply();
-
 		} catch (JSONException e) {
 			Log.e(TAG, "ERROR importing globals: " + e.getMessage());
 			return -1;
@@ -556,7 +558,7 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
         Intent i = new Intent(this, BackupBackgroundService.class);
         i.putExtra("item", b);
         i.putExtra("force", true);
-        ContextCompat.startForegroundService(getApplicationContext(), i);
+        BackupBackgroundService.enqueueWork(this, i);
         return 0;
     }
 

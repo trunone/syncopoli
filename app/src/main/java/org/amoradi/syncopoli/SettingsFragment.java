@@ -32,6 +32,13 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public final static String KEY_CLEAR_HOSTS = "pref_key_clear_hosts"; // String
     public final static String KEY_AS_ROOT = "pref_key_as_root"; // boolean
     public final static String KEY_VERSION_CODE = "pref_key_version_code";
+    public final static String KEY_CHARGER_ONLY = "pref_key_charger_only"; // boolean
+
+    public static boolean isSharedPreferenceBooleanKey(String k) {
+        return k.equals(SettingsFragment.KEY_WIFI_ONLY) || k.equals(SettingsFragment.KEY_AS_ROOT) || k.equals(SettingsFragment.KEY_CHARGER_ONLY);
+    }
+
+    private BackupActivity activity;
 
 	private final static int DEFAULT_RSYNC_PORT = 873;
 	private final static int DEFAULT_SSH_PORT = 22;
@@ -48,12 +55,21 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         KEY_SSH_PASSWORD,
         KEY_WIFI_ONLY,
         KEY_WIFI_NAME,
-        KEY_AS_ROOT
+        KEY_AS_ROOT,
+        KEY_CHARGER_ONLY
     };
 
     @Override
+    public void onAttach(Context context) {
+        // XXX: Avoid Nullpointer if fragment is detached and
+        // getActivity is called in anonymous function
+        super.onAttach(context);
+        this.activity = (BackupActivity) context;
+    }
+
+    @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (key.equals(KEY_WIFI_ONLY) || key.equals(KEY_AS_ROOT)) {
+        if (isSharedPreferenceBooleanKey(key)) {
             return;
         }
 
@@ -84,8 +100,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             if (prefs.getString(KEY_FREQUENCY, "8").equals("")) {
                 prefs.edit().putString(KEY_FREQUENCY, Integer.toString(0)).apply();
             }
-
-            ((BackupActivity)getActivity()).setupSyncAccount();
+            activity.setupSyncAccount();
         }
 
         /*
@@ -118,7 +133,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         verifyButton.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                new GetHostFingerprintTask(getActivity().getWindow().getContext()).execute();
+                new GetHostFingerprintTask(activity.getWindow().getContext()).execute();
                 return true;
             }
         });
@@ -127,7 +142,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         clearButton.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                new ClearHostsTask(getActivity().getWindow().getContext()).execute();
+                new ClearHostsTask(activity.getWindow().getContext()).execute();
                 return true;
             }
         });
