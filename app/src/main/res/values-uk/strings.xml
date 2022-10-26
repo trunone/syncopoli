@@ -44,7 +44,7 @@
     <string name="pref_title_wifi_only">Тільки Wifi</string>
     <string name="pref_title_wifi_name">SSID для синхронізації (розділені ;)</string>
     <string name="pref_title_as_root">Запустити як root</string>
-    <string name="pref_title_verify_host">Довіряти відбитку хоста<string>
+    <string name="pref_title_verify_host">Довіряти відбитку хоста</string>
     <string name="pref_title_clear_hosts">Очистити довірені хости</string>
 
     <string-array name="pref_entries_protocol">
