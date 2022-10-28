@@ -86,7 +86,7 @@ public class BackupLogFragment extends Fragment {
             try {
                 textReaderThread.join();
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                Log.e(TAG, "join failed", e);
             }
         }
     }
@@ -104,7 +104,7 @@ public class BackupLogFragment extends Fragment {
         } catch (FileNotFoundException e) {
             stopWorker();
             textLineAdapter.addTextLine(new TextLine(0, e.getMessage()));
-            e.printStackTrace();
+            Log.e(TAG, "Logfile not found", e);
         }
     }
 
@@ -248,7 +248,7 @@ public class BackupLogFragment extends Fragment {
                 in.close();
                 stopped.set(true);
             } catch (IOException e) {
-                // Ignore
+                Log.e(TAG, "Clean up failed", e);
             }
         }
 
@@ -291,7 +291,7 @@ public class BackupLogFragment extends Fragment {
             try {
                 bufferedReader.close();
             } catch (IOException e) {
-                // XXX: ignore
+                Log.e(TAG, "Clean up failed", e);
             }
             cleanUp();
         }

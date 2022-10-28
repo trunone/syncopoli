@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +17,7 @@ import android.widget.TextView;
 public class BackupAdapter extends RecyclerView.Adapter<BackupAdapter.ViewHolder> implements IBackupItemClickHandler {
     IBackupHandler mBackupHandler;
     private static Context mContext;
+    private static final String TAG = "Syncopoli";
 
     public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         IBackupItemClickHandler mBackupClickHandler;
@@ -117,9 +120,11 @@ public class BackupAdapter extends RecyclerView.Adapter<BackupAdapter.ViewHolder
         return mBackupHandler.getBackups().size();
     }
 
+
     public void onBackupShowLog(int pos) {
         BackupItem item = mBackupHandler.getBackups().get(pos);
         if (item == null) {
+            Log.e(TAG, "invalid index in event handler: " + pos);
             return;
         }
         mBackupHandler.showLog(item);
@@ -128,6 +133,7 @@ public class BackupAdapter extends RecyclerView.Adapter<BackupAdapter.ViewHolder
     public void onBackupDelete(int pos) {
         BackupItem item = mBackupHandler.getBackups().get(pos);
         if (item == null) {
+            Log.e(TAG, "invalid index in event handler: " + pos);
             return;
         }
         mBackupHandler.removeBackup(item);
@@ -137,6 +143,7 @@ public class BackupAdapter extends RecyclerView.Adapter<BackupAdapter.ViewHolder
     public void onBackupEdit(int pos) {
         BackupItem item = mBackupHandler.getBackups().get(pos);
         if (item == null) {
+            Log.e(TAG, "invalid index in event handler: " + pos);
             return;
         }
         mBackupHandler.editBackup(item);
@@ -146,6 +153,7 @@ public class BackupAdapter extends RecyclerView.Adapter<BackupAdapter.ViewHolder
     public void onBackupCopy(int pos) {
         BackupItem item = mBackupHandler.getBackups().get(pos);
         if (item == null) {
+            Log.e(TAG, "invalid index in event handler: " + pos);
             return;
         }
         mBackupHandler.copyBackup(item);
@@ -155,6 +163,7 @@ public class BackupAdapter extends RecyclerView.Adapter<BackupAdapter.ViewHolder
     public void onBackupRun(int pos) {
         BackupItem item = mBackupHandler.getBackups().get(pos);
         if (item == null) {
+            Log.e(TAG, "invalid index in event handler: " + pos);
             return;
         }
         mBackupHandler.runBackup(item);
