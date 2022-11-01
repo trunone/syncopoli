@@ -8,10 +8,8 @@ import android.app.FragmentTransaction;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -20,7 +18,6 @@ import androidx.annotation.LayoutRes;
 import com.google.android.material.snackbar.Snackbar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
 
 import android.util.Log;
 import android.view.Menu;
@@ -46,10 +43,6 @@ import org.json.*;
 public class BackupActivity extends AppCompatActivity implements IBackupHandler {
     private static final String TAG = "Syncopoli";
 
-    public static final String SYNC_AUTHORITY = "org.amoradi.syncopoli.provider";
-    public static final String SYNC_ACCOUNT_NAME = "Syncopoli Sync Account";
-    public static final String SYNC_ACCOUNT_TYPE = "org.amoradi.syncopoli";
-
     protected class Perm {
         public String value;
         public int code;
@@ -69,7 +62,6 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
         new Perm(android.Manifest.permission.ACCESS_WIFI_STATE, 6),
         new Perm(android.Manifest.permission.ACCESS_COARSE_LOCATION, 7),
         new Perm(android.Manifest.permission.WAKE_LOCK, 8),
-        new Perm(Manifest.permission.GET_ACCOUNTS, 9)
     };
 
     BackupHandler mBackupHandler;
@@ -82,13 +74,11 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
     }
 
     protected void setup(boolean checkPerms) {
+        setupSyncing(this);
         if (checkPerms) {
             checkRuntimePerms();
         }
-
         if (isFirstRun()) {
-            setupSyncAccount();
-
             if (copyExecutables() != 0) {
                 Toast.makeText(getApplicationContext(), "Unable to copy ssh and/or rsync executables. Please submit a bug report.", Toast.LENGTH_LONG).show();
             }
@@ -127,7 +117,7 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
                     return false;
                 }
             }
-        }       
+        }
 
         return true;
     }
@@ -147,39 +137,14 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
         setSupportActionBar(t);
     }
 
-    public Account getOrCreateSyncAccount() {
-        /* get */
-        AccountManager accman = AccountManager.get(this);
-
-        for (Account acc : accman.getAccountsByType(SYNC_ACCOUNT_TYPE)) {
-            if (acc.name.equals(SYNC_ACCOUNT_NAME)) {
-                return acc;
-            }
-        }
-
-        /* if not found, create */
-        Account acc = new Account(SYNC_ACCOUNT_NAME, SYNC_ACCOUNT_TYPE);
-
-        if (accman.addAccountExplicitly(acc, null, null)) {
-            ContentResolver.setIsSyncable(acc, SYNC_AUTHORITY, 1);
-            ContentResolver.setSyncAutomatically(acc, SYNC_AUTHORITY, true);
-        }
-
-        return acc;
-    }
-        
-    public void setupSyncAccount() {
-        Account acc = getOrCreateSyncAccount();
-
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        long freq = Long.parseLong(prefs.getString(SettingsFragment.KEY_FREQUENCY, "8"));
-        freq = freq * 3600; // hours to seconds
-
-        // ContentResolver.addPeriodicSync enforces a min of 1 hour
-        if (freq == 0) {
-            ContentResolver.removePeriodicSync(acc, SYNC_AUTHORITY, new Bundle());
-        } else {
-            ContentResolver.addPeriodicSync(acc, SYNC_AUTHORITY, new Bundle(), freq);
+    public static void setupSyncing(Context context) {
+        /*
+         * We reschedule the pending tasks when application launches.
+         */
+        ScheduleManager manager = new ScheduleManager(context);
+        manager.scheduleWithJob();
+        if (manager.isAlarmSchedulerEnabled()) {
+            manager.scheduleWithAlarm();
         }
     }
 
@@ -200,14 +165,7 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
                       Snackbar.LENGTH_SHORT).show();
 
         List<BackupItem> bs = mBackupHandler.getBackups();
-        BackupItem[] backups = new BackupItem[bs.size()];
-        bs.toArray(backups);
-
-
-        Intent i = new Intent(this, BackupBackgroundService.class);
-        i.putExtra("items", backups);
-        i.putExtra("force", true);
-        BackupBackgroundService.enqueueWork(this, i);
+        BackupWorker.syncNow(this, bs);
     }
 
     @Override
@@ -239,7 +197,7 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
 
 	public int exportSettings() {
 		List<BackupItem> backups = mBackupHandler.getBackups();
-		
+
 		JSONObject exportObj = new JSONObject();
 
         try {
@@ -273,7 +231,7 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
 			Log.e(TAG, "ERROR exporting globals while adding to exportObj: " + e.getMessage());
 			return -1;
 		}
-		
+
 		/*
 		 * get profile configs
 		 */
@@ -321,7 +279,7 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
 			Log.e(TAG, "ERROR exporting profiles while writing: " + e.getMessage());
 			return -1;
 		}
-		
+
 		return 0;
 	}
 
@@ -380,7 +338,7 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
                       e.getMessage());
                 return -1;
             }
-            
+
             if (version == 2) {
                 ret = importSettingsV2(exportedSettings);
             } else {
@@ -476,7 +434,7 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
             Log.e(TAG, "ERROR import version 2 profiles: " + e.getMessage());
             return -1;
         }
-        
+
         if (importGlobalSettings(globals) != 0) {
             return -1;
         }
@@ -554,11 +512,7 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
         Snackbar.make(findViewById(R.id.backuplist_coordinator),
                 "Running '" + b.name + "'",
                 Snackbar.LENGTH_SHORT).show();
-
-        Intent i = new Intent(this, BackupBackgroundService.class);
-        i.putExtra("item", b);
-        i.putExtra("force", true);
-        BackupBackgroundService.enqueueWork(this, i);
+        BackupWorker.syncNow(this, b);
         return 0;
     }
 
@@ -585,13 +539,13 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
 		if (ret != 0) {
 			return ret;
 		}
-		
+
         return copyExecutable("ssh");
     }
 
     public int copyExecutable(String filename) {
         // copy and overwrite
-        
+
         File file = getFileStreamPath(filename);
 
 		String[] abis = {Build.CPU_ABI, Build.CPU_ABI2};
@@ -600,7 +554,7 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
 		}
 
 		InputStream src = null;
-		
+
 		// try to grab matching executable for a ABI supported by this device
 		for (String abi : abis) {
             try {
