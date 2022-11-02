@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +17,7 @@ import android.widget.TextView;
 public class BackupAdapter extends RecyclerView.Adapter<BackupAdapter.ViewHolder> implements IBackupItemClickHandler {
     IBackupHandler mBackupHandler;
     private static Context mContext;
+    private static final String TAG = "Syncopoli";
 
     public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         IBackupItemClickHandler mBackupClickHandler;
@@ -90,12 +93,15 @@ public class BackupAdapter extends RecyclerView.Adapter<BackupAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int pos) {
-        holder.mProfileTextView.setText(mBackupHandler.getBackups().get(pos).name);
-
-        if (mBackupHandler.getBackups().get(pos).lastUpdate == null) {
+        final BackupItem item = mBackupHandler.getBackups().get(pos);
+        if (item == null) {
+            return;
+        }
+        holder.mProfileTextView.setText(item.name);
+        if (item.lastUpdate == null) {
             holder.mSrcTextView.setText("This backup has never run");
         } else {
-            holder.mSrcTextView.setText("Last update: " + mBackupHandler.getBackups().get(pos).lastUpdate.toString());
+            holder.mSrcTextView.setText("Last update: " + item.lastUpdate.toString());
         }
 
         holder.mView.setTranslationX(holder.mView.getTranslationX() -50f);
@@ -114,26 +120,52 @@ public class BackupAdapter extends RecyclerView.Adapter<BackupAdapter.ViewHolder
         return mBackupHandler.getBackups().size();
     }
 
+
     public void onBackupShowLog(int pos) {
-        mBackupHandler.showLog(mBackupHandler.getBackups().get(pos));
+        BackupItem item = mBackupHandler.getBackups().get(pos);
+        if (item == null) {
+            Log.e(TAG, "invalid index in event handler: " + pos);
+            return;
+        }
+        mBackupHandler.showLog(item);
     }
 
     public void onBackupDelete(int pos) {
-        mBackupHandler.removeBackup(mBackupHandler.getBackups().get(pos));
+        BackupItem item = mBackupHandler.getBackups().get(pos);
+        if (item == null) {
+            Log.e(TAG, "invalid index in event handler: " + pos);
+            return;
+        }
+        mBackupHandler.removeBackup(item);
         notifyDataSetChanged();
     }
 
     public void onBackupEdit(int pos) {
-        mBackupHandler.editBackup(mBackupHandler.getBackups().get(pos));
+        BackupItem item = mBackupHandler.getBackups().get(pos);
+        if (item == null) {
+            Log.e(TAG, "invalid index in event handler: " + pos);
+            return;
+        }
+        mBackupHandler.editBackup(item);
 		notifyDataSetChanged();
     }
 
     public void onBackupCopy(int pos) {
-        mBackupHandler.copyBackup(mBackupHandler.getBackups().get(pos));
+        BackupItem item = mBackupHandler.getBackups().get(pos);
+        if (item == null) {
+            Log.e(TAG, "invalid index in event handler: " + pos);
+            return;
+        }
+        mBackupHandler.copyBackup(item);
         notifyDataSetChanged();
     }
 
     public void onBackupRun(int pos) {
-        mBackupHandler.runBackup(mBackupHandler.getBackups().get(pos));
+        BackupItem item = mBackupHandler.getBackups().get(pos);
+        if (item == null) {
+            Log.e(TAG, "invalid index in event handler: " + pos);
+            return;
+        }
+        mBackupHandler.runBackup(item);
     }
 }
