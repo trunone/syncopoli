@@ -88,8 +88,10 @@ public class AddBackupItemFragment extends Fragment {
 
         if (mBackup.direction == BackupItem.Direction.OUTGOING) {
             v_dir.setSelection(1);
-        } else {
+        } else if (mBackup.direction == BackupItem.Direction.INCOMING) {
             v_dir.setSelection(0);
+        } else {
+            v_dir.setSelection(2);
         }
 
         v_name.setText(mBackup.name);
@@ -146,8 +148,10 @@ public class AddBackupItemFragment extends Fragment {
             Spinner s = (Spinner) v.findViewById(R.id.addbackupitem_direction);
             if (s.getSelectedItemPosition() == 0) {
                 backupItem.direction = BackupItem.Direction.INCOMING;
-            } else {
+            } else if (s.getSelectedItemPosition() == 1) {
                 backupItem.direction = BackupItem.Direction.OUTGOING;
+            } else {
+                backupItem.direction = BackupItem.Direction.LOCAL;
             }
 
             if (mBackup == null) {

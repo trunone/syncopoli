@@ -294,8 +294,10 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
 
 				if (i.direction == BackupItem.Direction.INCOMING) {
 					p.put("direction", "INCOMING");
-				} else {
-					p.put("direction", "OUTGOING");
+				} else if (i.direction == BackupItem.Direction.OUTGOING) {
+                    p.put("direction", "OUTGOING");
+                } else {
+                    p.put("direction", "LOCAL");
 				}
 
 				profiles.put(p);
@@ -424,8 +426,10 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
 
                 if (jb.getString("direction").equals("INCOMING")) {
                     b.direction = BackupItem.Direction.INCOMING;
-                } else {
+                } else if (jb.getString("direction").equals("OUTGOING")) {
                     b.direction = BackupItem.Direction.OUTGOING;
+                } else {
+                    b.direction = BackupItem.Direction.LOCAL;
                 }
 
                 mBackupHandler.addBackup(b);

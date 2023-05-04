@@ -13,6 +13,7 @@
     <string-array name="addbackupitem_direction_entries">
         <item>Remote → Lokal</item>
         <item>Lokal → Remote</item>
+        <item>Lokal → Lokal</item>
     </string-array>
 
     <!-- Action bar icons -->

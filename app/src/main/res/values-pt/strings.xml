@@ -19,6 +19,7 @@
     <string-array name="addbackupitem_direction_entries">
         <item>Remoto para local</item>
         <item>Local para remoto</item>
+        <item>Local para local</item>
     </string-array>
 
     <!-- Action bar icons -->

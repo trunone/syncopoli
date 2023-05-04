@@ -18,6 +18,7 @@
     <string-array name="addbackupitem_direction_entries">
         <item>Удаленный в локальный</item>
         <item>Локальный в удаленный</item>
+        <item>Локальный в Локальный</item>
     </string-array>
 
     <!-- Action bar icons -->
