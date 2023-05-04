@@ -18,6 +18,7 @@
     <string-array name="addbackupitem_direction_entries">
         <item>Afgelegen naar lokaal</item>
         <item>Lokaal naar afgelegen</item>
+        <item>Lokaal naar lokaal</item>
     </string-array>
 
     <!-- Action bar icons -->

@@ -20,6 +20,7 @@
     <string-array name="addbackupitem_direction_entries">
         <item>Vzdálené -> lokální</item>
         <item>Lokální -> vzdálené</item>
+        <item>Lokální -> lokální</item>
     </string-array>
 
     <!-- Action bar icons -->

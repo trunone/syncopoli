@@ -20,6 +20,7 @@
     <string-array name="addbackupitem_direction_entries">
         <item>Віддалений -> локальний</item>
         <item>Локальний -> віддалений</item>
+        <item>Локальний -> Локальний</item>
     </string-array>
 
     <!-- Action bar icons -->

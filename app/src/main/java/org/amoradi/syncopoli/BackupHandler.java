@@ -75,8 +75,10 @@ public class BackupHandler implements IBackupHandler {
 
         if (item.direction == BackupItem.Direction.INCOMING) {
             values.put(BackupSyncSchema.COLUMN_DIRECTION, "INCOMING");
-        } else {
+        } else if (item.direction == BackupItem.Direction.OUTGOING) {
             values.put(BackupSyncSchema.COLUMN_DIRECTION, "OUTGOING");
+        } else {
+            values.put(BackupSyncSchema.COLUMN_DIRECTION, "LOCAL");
         }
 
         db.insert(BackupSyncSchema.TABLE_NAME, null, values);
@@ -181,8 +183,10 @@ public class BackupHandler implements IBackupHandler {
             String dir = c.getString(c.getColumnIndex(BackupSyncSchema.COLUMN_DIRECTION));
             if (dir.equals("INCOMING")) {
                 x.direction = BackupItem.Direction.INCOMING;
-            } else {
+            } else if (dir.equals("OUTGOING")) {
                 x.direction = BackupItem.Direction.OUTGOING;
+            } else {
+                x.direction = BackupItem.Direction.LOCAL;
             }
 
             try {
@@ -236,8 +240,10 @@ public class BackupHandler implements IBackupHandler {
 
         if (b.direction == BackupItem.Direction.INCOMING) {
             values.put(BackupSyncSchema.COLUMN_DIRECTION, "INCOMING");
-        } else {
+        } else if (b.direction == BackupItem.Direction.OUTGOING) {
             values.put(BackupSyncSchema.COLUMN_DIRECTION, "OUTGOING");
+        } else {
+            values.put(BackupSyncSchema.COLUMN_DIRECTION, "LOCAL");
         }
 
         db.update(BackupSyncSchema.TABLE_NAME, values, "name='" + old_name + "'", null);
@@ -355,10 +361,14 @@ public class BackupHandler implements IBackupHandler {
                 if (b.direction == BackupItem.Direction.OUTGOING) {
                     args.addAll(b.sources);
                     args.add(rsync_username + "@" + server_address + ":" + b.destination);
-                } else {
+                } else if (b.direction == BackupItem.Direction.INCOMING) {
                     for (String s : b.sources) {
                         args.add(rsync_username + "@" + server_address + ":" + s);
                     }
+                    args.add(b.destination);
+                } else {
+                    // Direction.LOCAL
+                    args.addAll(b.sources);
                     args.add(b.destination);
                 }
 
@@ -368,10 +378,14 @@ public class BackupHandler implements IBackupHandler {
                 if (b.direction == BackupItem.Direction.OUTGOING) {
                     args.addAll(b.sources);
                     args.add(rsync_username + "@" + server_address + "::" + b.destination);
-                } else {
+                } else if (b.direction == BackupItem.Direction.INCOMING) {
                     for (String s : b.sources) {
                         args.add(rsync_username + "@" + server_address + "::" + s);
                     }
+                    args.add(b.destination);
+                } else {
+                    // Direction.LOCAL
+                    args.addAll(b.sources);
                     args.add(b.destination);
                 }
             }

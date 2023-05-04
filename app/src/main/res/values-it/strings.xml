@@ -18,6 +18,7 @@
     <string-array name="addbackupitem_direction_entries">
         <item>Da remoto a locale</item>
         <item>Da locale a remoto</item>
+        <item>Da locale a locale</item>
     </string-array>
 
     <!-- Action bar icons -->

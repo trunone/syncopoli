@@ -20,6 +20,7 @@
     <string-array name="addbackupitem_direction_entries">
         <item>Serveur distant vers local</item>
         <item>Local vers serveur distant</item>
+        <item>Local vers local</item>
     </string-array>
 
     <!-- Action bar icons -->
