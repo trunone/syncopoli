@@ -345,6 +345,7 @@ public class BackupHandler implements IBackupHandler {
             }
 
             if (b.direction == BackupItem.Direction.LOCAL) {
+                args.add("-r");
                 args.addAll(b.sources);
                 args.add(b.destination);
             } else if (protocol.equals("SSH")) {
