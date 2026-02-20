@@ -75,6 +75,8 @@ public class BackupHandler implements IBackupHandler {
 
         if (item.direction == BackupItem.Direction.INCOMING) {
             values.put(BackupSyncSchema.COLUMN_DIRECTION, "INCOMING");
+        } else if (item.direction == BackupItem.Direction.LOCAL) {
+            values.put(BackupSyncSchema.COLUMN_DIRECTION, "LOCAL");
         } else {
             values.put(BackupSyncSchema.COLUMN_DIRECTION, "OUTGOING");
         }
@@ -181,6 +183,8 @@ public class BackupHandler implements IBackupHandler {
             String dir = c.getString(c.getColumnIndex(BackupSyncSchema.COLUMN_DIRECTION));
             if (dir.equals("INCOMING")) {
                 x.direction = BackupItem.Direction.INCOMING;
+            } else if (dir.equals("LOCAL")) {
+                x.direction = BackupItem.Direction.LOCAL;
             } else {
                 x.direction = BackupItem.Direction.OUTGOING;
             }
@@ -236,6 +240,8 @@ public class BackupHandler implements IBackupHandler {
 
         if (b.direction == BackupItem.Direction.INCOMING) {
             values.put(BackupSyncSchema.COLUMN_DIRECTION, "INCOMING");
+        } else if (b.direction == BackupItem.Direction.LOCAL) {
+            values.put(BackupSyncSchema.COLUMN_DIRECTION, "LOCAL");
         } else {
             values.put(BackupSyncSchema.COLUMN_DIRECTION, "OUTGOING");
         }
@@ -277,7 +283,7 @@ public class BackupHandler implements IBackupHandler {
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
             String rsync_username = prefs.getString(SettingsFragment.KEY_RSYNC_USERNAME, "");
 
-            if (rsync_username.equals("")) {
+            if (b.direction != BackupItem.Direction.LOCAL && rsync_username.equals("")) {
                 logFile.write("ERROR: Username not specified. Please set username in settings.".getBytes());
                 return -1;
             }
@@ -290,7 +296,7 @@ public class BackupHandler implements IBackupHandler {
 
             String server_address = prefs.getString(SettingsFragment.KEY_SERVER_ADDRESS, "");
 
-            if (server_address.equals("")) {
+            if (b.direction != BackupItem.Direction.LOCAL && server_address.equals("")) {
                 logFile.write("ERROR: Server address not specified. Please set Server address in settings.".getBytes());
                 return -1;
             }
@@ -299,12 +305,12 @@ public class BackupHandler implements IBackupHandler {
             String private_key = prefs.getString(SettingsFragment.KEY_PRIVATE_KEY, "");
             String port = prefs.getString(SettingsFragment.KEY_PORT, "22");
 
-            if (port.equals("")) {
+            if (b.direction != BackupItem.Direction.LOCAL && port.equals("")) {
                 logFile.write("ERROR: Port not specified. Please set Port in settings.".getBytes());
                 return -1;
             }
 
-            if (protocol.equals("SSH")) {
+            if (b.direction != BackupItem.Direction.LOCAL && protocol.equals("SSH")) {
                 if (private_key.equals("")) {
                     use_ssh_password = true;
                 } else {
@@ -338,7 +344,10 @@ public class BackupHandler implements IBackupHandler {
                 args.addAll(ArgumentTokenizer.tokenize(b.rsync_options));
             }
 
-            if (protocol.equals("SSH")) {
+            if (b.direction == BackupItem.Direction.LOCAL) {
+                args.addAll(b.sources);
+                args.add(b.destination);
+            } else if (protocol.equals("SSH")) {
                 args.add("-e");
                 String ssh_cmd = sshPath + " -p " + port;
 

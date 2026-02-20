@@ -18,7 +18,8 @@ class BackupItem implements Parcelable {
 
     public enum Direction {
         INCOMING,
-        OUTGOING
+        OUTGOING,
+        LOCAL
     };
 
     public String name;
@@ -92,7 +93,9 @@ class BackupItem implements Parcelable {
 
 		if (direction == Direction.OUTGOING) {
 			out.writeString("OUTGOING");
-		} else {
+		} else if (direction == Direction.LOCAL) {
+            out.writeString("LOCAL");
+        } else {
 			out.writeString("INCOMING");
 		}
 
@@ -120,7 +123,9 @@ class BackupItem implements Parcelable {
 			String y = in.readString();
 			if (y.equals("OUTGOING")) {
 				b.direction = Direction.OUTGOING;
-			} else {
+			} else if (y.equals("LOCAL")) {
+                b.direction = Direction.LOCAL;
+            } else {
 				b.direction = Direction.INCOMING;
 			}
 
