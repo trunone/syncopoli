@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -26,11 +27,14 @@ public class AddBackupItemFragment extends Fragment {
     IBackupHandler mHandler;
     BackupItem mBackup = null;
     int SOURCE_REQUEST_CODE = 1;
+    int DESTINATION_REQUEST_CODE = 2;
 
     private TextInputEditText v_name;
     private TextInputEditText v_src;
     private TextInputEditText v_dst;
     private TextInputEditText v_opts;
+    private TextInputLayout l_src;
+    private TextInputLayout l_dst;
 
     @Override
     public void onAttach(Activity acc) {
@@ -57,24 +61,24 @@ public class AddBackupItemFragment extends Fragment {
         v_src = (TextInputEditText) v.findViewById(R.id.addbackupitem_source);
         v_dst = (TextInputEditText) v.findViewById(R.id.addbackupitem_destination);
         v_opts = (TextInputEditText) v.findViewById(R.id.addbackupitem_rsync_options);
+        l_src = (TextInputLayout) v.findViewById(R.id.addbackupitem_source_layout);
+        l_dst = (TextInputLayout) v.findViewById(R.id.addbackupitem_destination_layout);
 
-		/*
-        v_src.setOnLongClickListener(new View.OnLongClickListener () {
+        l_src.setEndIconOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onLongClick(View v) {
-                Intent intent = new Intent("org.openintents.action.PICK_DIRECTORY");
-                intent.putExtra("org.openintents.extra.TITLE", "Source Directory");
-                intent.putExtra("org.openintents.extra.BUTTON_TEXT", "Select Directory");
-                if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
-                    startActivityForResult(intent, SOURCE_REQUEST_CODE);
-                } else {
-                    Toast.makeText(getActivity(), "Error: requires OI File Manager", Toast.LENGTH_SHORT).show();
-                }
-
-                return true;
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+                startActivityForResult(intent, SOURCE_REQUEST_CODE);
             }
         });
-		*/
+
+        l_dst.setEndIconOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+                startActivityForResult(intent, DESTINATION_REQUEST_CODE);
+            }
+        });
 
         Spinner v_dir = (Spinner) v.findViewById(R.id.addbackupitem_direction);
         String[] items = getResources().getStringArray(R.array.addbackupitem_direction_entries);
@@ -104,10 +108,45 @@ public class AddBackupItemFragment extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == SOURCE_REQUEST_CODE && resultCode == RESULT_OK) {
-            Uri path = data.getData();
-            v_src.setText(path.getPath());
+        if (resultCode == RESULT_OK && data != null) {
+            Uri uri = data.getData();
+            String path = getPathFromUri(uri);
+            if (path == null) {
+                // Fallback or error handling
+                path = uri.getPath();
+            }
+
+            if (requestCode == SOURCE_REQUEST_CODE) {
+                String currentText = v_src.getText().toString();
+                if (!currentText.isEmpty() && !currentText.endsWith("\n")) {
+                    v_src.append("\n");
+                }
+                v_src.append(path);
+            } else if (requestCode == DESTINATION_REQUEST_CODE) {
+                v_dst.setText(path);
+            }
         }
+    }
+
+    private String getPathFromUri(Uri uri) {
+        if (uri == null) return null;
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT &&
+            "com.android.externalstorage.documents".equals(uri.getAuthority())) {
+            String docId = android.provider.DocumentsContract.getTreeDocumentId(uri);
+            String[] split = docId.split(":");
+            String type = split[0];
+            String path = split.length > 1 ? split[1] : "";
+
+            if ("primary".equalsIgnoreCase(type)) {
+                return android.os.Environment.getExternalStorageDirectory() + "/" + path;
+            } else {
+                // Return generic path for non-primary volumes (like SD card UUID)
+                // Assuming standard mount point for now as best effort
+                 return "/storage/" + type + "/" + path;
+            }
+        }
+        return uri.getPath();
     }
 
     @Override
