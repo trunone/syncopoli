@@ -127,6 +127,9 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
             }
 
             for (Perm p : permsList) {
+                if (p.value.equals(Manifest.permission.GET_ACCOUNTS)) {
+                    continue;
+                }
                 if (checkSelfPermission(p.value) != PackageManager.PERMISSION_GRANTED) {
                     requestPermissions(new String[]{p.value}, p.code);
                     return false;
