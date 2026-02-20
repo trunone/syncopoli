@@ -121,7 +121,12 @@ public class BackupActivity extends AppCompatActivity implements IBackupHandler 
 
     protected boolean checkRuntimePerms() {
         if (Build.VERSION.SDK_INT >= 23) {
-            for (Perm p : mPerms) {
+            List<Perm> permsList = new ArrayList<>(Arrays.asList(mPerms));
+            if (Build.VERSION.SDK_INT >= 33) {
+                permsList.add(new Perm(Manifest.permission.POST_NOTIFICATIONS, 10));
+            }
+
+            for (Perm p : permsList) {
                 if (checkSelfPermission(p.value) != PackageManager.PERMISSION_GRANTED) {
                     requestPermissions(new String[]{p.value}, p.code);
                     return false;
