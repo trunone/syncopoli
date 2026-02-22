@@ -51,32 +51,45 @@ android {
     }
 }
 
-gradle.taskGraph.afterTask { task ->
-	if (task.name == "externalNativeBuildRelease" || task.name == "externalNativeBuildDebug") {
-		def mode = "release"
-		if (task.name == "externalNativeBuildDebug") {
-			mode = "debug"
-		}
-		def src = rootProject.file("app/build/intermediates/ndkBuild/${mode}/obj/local/")
-		def dst = rootProject.file('app/src/main/assets/')
+afterEvaluate {
+    android.applicationVariants.all { variant ->
+        def variantName = variant.name.capitalize()
+        def externalNativeBuildTask = tasks.findByName("externalNativeBuild${variantName}")
+        def mergeAssetsTask = tasks.findByName("merge${variantName}Assets")
 
-		copy {
-			from(src) {
-				exclude "**/objs"
-				exclude "**/objs-debug"
-				exclude "**/*.a"
-				exclude "**/*.o"
-				exclude "**/*.d"
-			}
-			
-			into dst
+        if (externalNativeBuildTask && mergeAssetsTask) {
+            mergeAssetsTask.dependsOn externalNativeBuildTask
 
-			eachFile {
-				println "copying " + it.getPath() + " to assets directory"
-			}
-		}
+            externalNativeBuildTask.doLast {
+                def buildType = variant.buildType.name.capitalize()
+                def buildDir = rootProject.file("app/build/intermediates/cxx/${buildType}/")
 
-	}
+                if (buildDir.exists()) {
+                    buildDir.eachDir { dir ->
+                        def src = new File(dir, "obj/local")
+                        if (src.exists()) {
+                            def dst = rootProject.file('app/src/main/assets/')
+                            copy {
+                                from(src) {
+                                    exclude "**/objs"
+                                    exclude "**/objs-debug"
+                                    exclude "**/*.a"
+                                    exclude "**/*.o"
+                                    exclude "**/*.d"
+                                }
+
+                                into dst
+
+                                eachFile {
+                                    println "copying " + it.getPath() + " to assets directory"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 clean {
